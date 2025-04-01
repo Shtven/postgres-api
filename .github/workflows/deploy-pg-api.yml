@@ -28,3 +28,4 @@ jobs:
         
       - name: docker push
         run:  docker push ${{ secrets.DOCKER_USER}}/pg-restapi:${{github.sha}} 
+
