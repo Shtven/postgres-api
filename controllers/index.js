@@ -71,5 +71,7 @@ const getAllUsers = async (req, res) => {
 
 module.exports = {
   createUser,
+  deleteUser,
+  updateUser,
   getAllUsers
 };
