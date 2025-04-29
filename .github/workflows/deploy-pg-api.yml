@@ -1,11 +1,11 @@
-name: deploy-pg-api
+name: deploy-mysql-api
 
 on:
   push:
     branches: ["master"]
 
 jobs:
-  deploy-pg-api:
+  deploy-mysql-api:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,16 +15,26 @@ jobs:
       - run: echo 'hello world ...'
       - run: ls -la
       - run: touch .env
-      - run: echo 'DEV_DATABASE_URL=${{secrets.PG_CONN}}'  >> .env
+      - run: echo 'DEV_DATABASE_URL=${{secrets.PG_CONN}}' >> .env
       - run: cat .env
+
+      # Si necesitas instalar dependencias o hacer migraciones
+      - run: npm install
+      - run: npm install -g sequelize-cli
+      - run: sequelize db:migrate
+
       - run: docker build -t shtven/pg-restapi:${{github.sha}} .
       - run: docker images
-   
+
+      - run: docker run --name api-pos -p 8083:8083 -d shtven/pg-restapi:${{github.sha}} 
+      - run: docker ps
+      - run: docker exec api-pos ls -la
+
       - name: docker login
         env:
           DOCKER_USER: ${{secrets.DOCKER_USER}}
           DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
-        run:  docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-        
+        run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+
       - name: docker push
-        run:  docker push ${{ secrets.DOCKER_USER}}/pg-restapi:${{github.sha}}   
+        run: docker push ${{ secrets.DOCKER_USER }}/pg-restapi:${{github.sha}}
