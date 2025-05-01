@@ -11,6 +11,23 @@ const createUser = async (req, res) => {
   }
 };
 
+const getUserById = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const pokemon = await models.User.findByPk(id);
+
+    if (!pokemon) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    res.json(pokemon);
+  } catch (error) {
+    console.error('Error en getUserById:', error);
+    res.status(500).json({ error: 'Error al obtener el Usuario' });
+  }
+};
+
 const  deleteUser  = async (req,  res)  =>  {
   console.log('deleting user...');
 
@@ -71,6 +88,7 @@ const getAllUsers = async (req, res) => {
 
 module.exports = {
   createUser,
+  getUserById,
   deleteUser,
   updateUser,
   getAllUsers
